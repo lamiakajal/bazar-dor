@@ -28,11 +28,11 @@ export default function RootLayout({
       <body
         className={`${hindSiliguri.className} antialiased bg-base-100 text-base-content min-h-screen flex flex-col`}
       >
-        {/* Real-time market commodity ticker */}
-        <PriceTicker />
-
-        {/* Main sticky navigation header */}
+        {/* Main top navigation header with category bar */}
         <Navbar />
+
+        {/* Real-time market commodity ticker strip */}
+        <PriceTicker />
 
         {/* Application route content */}
         <main className="flex-1">{children}</main>
