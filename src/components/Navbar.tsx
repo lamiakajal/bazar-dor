@@ -15,7 +15,7 @@ export default function Navbar() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Fetch product categories from API
+  // Fetch commodity categories from API
   useEffect(() => {
     async function loadCategories() {
       try {
@@ -33,7 +33,7 @@ export default function Navbar() {
     loadCategories();
   }, []);
 
-  // Handle user authentication termination
+  // Handle user authentication sign out
   const handleSignOut = async () => {
     await signOut({
       fetchOptions: {
@@ -63,7 +63,9 @@ export default function Navbar() {
             <nav className="hidden lg:flex items-center gap-2">
               <Link
                 href="/"
-                className={`btn btn-sm btn-ghost ${pathname === "/" ? "btn-active font-bold" : ""}`}
+                className={`btn btn-sm btn-ghost ${
+                  pathname === "/" ? "btn-active font-bold" : ""
+                }`}
               >
                 সব পণ্য
               </Link>
@@ -73,7 +75,9 @@ export default function Navbar() {
                   <Link
                     key={cat.id}
                     href={`/category/${cat.slug}`}
-                    className={`btn btn-sm btn-ghost ${isActive ? "btn-active font-bold" : ""}`}
+                    className={`btn btn-sm btn-ghost ${
+                      isActive ? "btn-active font-bold" : ""
+                    }`}
                   >
                     <span>{cat.icon}</span>
                     <span>{cat.nameBn}</span>
@@ -94,8 +98,9 @@ export default function Navbar() {
                   role="button"
                   className="btn btn-ghost btn-circle avatar"
                 >
-                  <div className="w-9 rounded-full ring ring-primary ring-offset-base-100 ring-offset-1 flex items-center justify-center bg-primary text-primary-content font-bold">
+                  <div className="w-9 rounded-full ring ring-primary ring-offset-base-100 ring-offset-1 flex items-center justify-center bg-primary text-primary-content font-bold overflow-hidden">
                     {session.user.image ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={session.user.image}
                         alt={session.user.name || "Avatar"}
@@ -134,7 +139,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Hamburger Menu Toggle */}
+          {/* Mobile Hamburger Menu Button */}
           <div className="flex lg:hidden items-center">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -176,7 +181,9 @@ export default function Navbar() {
             <Link
               href="/"
               onClick={() => setMobileMenuOpen(false)}
-              className={`btn btn-sm justify-start btn-ghost ${pathname === "/" ? "btn-active font-bold" : ""}`}
+              className={`btn btn-sm justify-start btn-ghost ${
+                pathname === "/" ? "btn-active font-bold" : ""
+              }`}
             >
               সব পণ্য
             </Link>
