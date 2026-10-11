@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Product, formatPrice } from "@/lib/utils";
+import { Product, formatPrice, toBengaliNumber } from "@/lib/utils";
 
 export default function PriceTicker() {
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
-    // Fetch latest market commodity prices for ticker strip
     async function fetchTickerData() {
       try {
         const res = await fetch(
@@ -27,12 +26,11 @@ export default function PriceTicker() {
 
   if (products.length === 0) return null;
 
-  // Duplicate items array to achieve a seamless infinite loop
   const tickerItems = [...products, ...products];
 
   return (
-    <div className="bg-base-200 border-b border-base-300 overflow-hidden py-2 text-xs">
-      <div className="animate-marquee items-center gap-6">
+    <div className="bg-[#f7f9f6] border-y border-gray-200/80 overflow-hidden py-2 text-xs">
+      <div className="animate-marquee items-center gap-4">
         {tickerItems.map((item, index) => {
           const isUp = item.change.dir === "up";
           const isDown = item.change.dir === "down";
@@ -41,28 +39,27 @@ export default function PriceTicker() {
             <Link
               key={`${item.id}-${index}`}
               href={`/product/${item.slug}`}
-              className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity whitespace-nowrap px-2"
+              className="inline-flex items-center gap-2 whitespace-nowrap px-3 py-1 bg-white border border-gray-200 rounded-md hover:border-emerald-400 transition-colors shadow-2xs"
             >
-              <span>{item.image}</span>
-              <span className="font-medium text-base-content">
-                {item.nameBn}
-              </span>
-              <span className="font-semibold text-base-content/80">
-                ৳ {formatPrice(item.today)}
+              <span className="text-sm">{item.image}</span>
+              <span className="font-semibold text-gray-800">{item.nameBn}</span>
+              <span className="text-gray-600">
+                ৳{formatPrice(item.today)} টাকা/
+                {item.unit === "kg" ? "কেজি" : item.unit}
               </span>
               <span
-                className={`font-bold flex items-center gap-0.5 ${
+                className={`font-bold inline-flex items-center gap-0.5 ${
                   isUp
-                    ? "text-error"
+                    ? "text-red-500"
                     : isDown
-                      ? "text-success"
-                      : "text-base-content/60"
+                      ? "text-emerald-600"
+                      : "text-gray-400"
                 }`}
               >
                 {isUp && "▲"}
                 {isDown && "▼"}
                 {!isUp && !isDown && "—"}
-                {item.change.pct}%
+                {toBengaliNumber(item.change.pct)}%
               </span>
             </Link>
           );
