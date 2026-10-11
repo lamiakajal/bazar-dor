@@ -1,22 +1,22 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-/* Keyframe animation for infinite horizontal price ticker marquee */
+/* Infinite Marquee Animation for Ticker */
 @keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .animate-marquee {
-  display: flex;
-  width: max-content;
-  animation: marquee 30s linear infinite;
+  animation: marquee 85s linear infinite;
+  display: flex;
+  width: max-content;
 }
 
 .animate-marquee:hover {
-  animation-play-state: paused;
+  animation-play-state: paused;
 }
