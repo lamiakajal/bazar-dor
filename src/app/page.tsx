@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import ProductCard from "@/components/ProductCard";
-import { Product, getBanglaDate } from "@/lib/utils";
+import { Product, getBanglaDate, toBengaliNumber } from "@/lib/utils";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
@@ -32,7 +32,7 @@ export default function HomePage() {
     loadProducts();
   }, []);
 
-  // Filter top price increases
+  // Filter top 6 price increases
   const topRisers = useMemo(() => {
     return [...products]
       .filter((p) => p.change.dir === "up")
@@ -40,7 +40,7 @@ export default function HomePage() {
       .slice(0, 6);
   }, [products]);
 
-  // Filter top price decreases
+  // Filter top 6 price decreases
   const topFallers = useMemo(() => {
     return [...products]
       .filter((p) => p.change.dir === "down")
@@ -50,7 +50,7 @@ export default function HomePage() {
 
   return (
     <div className="bg-[#f7f9f6] min-h-screen py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Figma Hero Banner Card */}
         <section className="bg-[#f2f5ef] border border-gray-200/60 rounded-3xl p-6 sm:p-10 lg:p-12 relative overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
@@ -146,10 +146,10 @@ export default function HomePage() {
           </div>
         ) : (
           <>
-            {/* Top Price Risers */}
+            {/* Section 1: আজ দাম বেড়েছে */}
             <section className="space-y-4">
               <div className="flex items-center gap-2">
-                <span className="text-red-500 text-base">▲</span>
+                <span className="text-red-500 text-sm">▲</span>
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                   আজ দাম বেড়েছে
                 </h2>
@@ -161,16 +161,34 @@ export default function HomePage() {
               </div>
             </section>
 
-            {/* Top Price Fallers */}
-            <section id="sobb-ponno" className="space-y-4 pt-4">
+            {/* Section 2: আজ দাম কমেছে */}
+            <section className="space-y-4">
               <div className="flex items-center gap-2">
-                <span className="text-emerald-600 text-base">▼</span>
+                <span className="text-emerald-600 text-sm">▼</span>
                 <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                   আজ দাম কমেছে
                 </h2>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {topFallers.map((item) => (
+                  <ProductCard key={item.id} product={item} />
+                ))}
+              </div>
+            </section>
+
+            {/* Section 3: সব পণ্য */}
+            <section id="sobb-ponno" className="space-y-4 pt-4">
+              <div className="flex flex-col gap-1">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+                  সব পণ্য
+                </h2>
+                <p className="text-xs text-gray-400 font-medium">
+                  মোট {toBengaliNumber(products.length)}টি পণ্য • ১ পেজে
+                  প্রদর্শিত
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {products.map((item) => (
                   <ProductCard key={item.id} product={item} />
                 ))}
               </div>
