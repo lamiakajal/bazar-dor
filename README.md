@@ -7,7 +7,7 @@ A fast, responsive, and localized commodity price tracking platform. It allows u
 ## 🌐 Live URL & Repository
 
 - **Live Application:** [https://bazar-dor-lamiakajal.vercel.app](https://bazar-dor-lamiakajal.vercel.app)
-- **GitHub Repository:** [https://github.com/ProgrammingHero1/B14-A7-BazarDor](https://github.com/ProgrammingHero1/B14-A7-BazarDor)
+- **GitHub Repository:** [https://github.com/lamiakajal/bazar-dor](https://github.com/lamiakajal/bazar-dor)
 
 ---
 
