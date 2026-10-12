@@ -11,8 +11,8 @@ const API_BASE =
 
 function ProductCardSkeleton() {
   return (
-    <div className="w-full bg-white rounded-2xl border border-[#e5e9e2] p-5 shadow-xs animate-pulse">
-      <div className="flex items-center gap-3.5 mb-5">
+    <div className="w-full bg-white rounded-2xl border border-[#e5e9e2] p-4 sm:p-5 shadow-xs animate-pulse">
+      <div className="flex items-center gap-3.5 mb-4 sm:mb-5">
         <div className="w-12 h-12 rounded-xl bg-gray-200 shrink-0" />
         <div className="space-y-2 flex-1">
           <div className="h-4 bg-gray-200 rounded-md w-3/4" />
@@ -35,6 +35,12 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
+  }, []);
+
+  useEffect(() => {
     let isMounted = true;
 
     async function loadProducts() {
@@ -43,7 +49,7 @@ export default function HomePage() {
         const res = await fetch(`${API_BASE}/products`);
         if (res.ok) {
           const data: Product[] = await res.json();
-          if (isMounted) setProducts(data);
+          if (isMounted) setProducts(Array.isArray(data) ? data : []);
         }
       } catch (error) {
         console.error("Failed to load products", error);
@@ -61,15 +67,15 @@ export default function HomePage() {
 
   const topRisers = useMemo(() => {
     return [...products]
-      .filter((p) => p.change.dir === "up")
-      .sort((a, b) => b.change.pct - a.change.pct)
+      .filter((p) => p.change?.dir === "up")
+      .sort((a, b) => (b.change?.pct ?? 0) - (a.change?.pct ?? 0))
       .slice(0, 6);
   }, [products]);
 
   const topFallers = useMemo(() => {
     return [...products]
-      .filter((p) => p.change.dir === "down")
-      .sort((a, b) => a.change.pct - b.change.pct)
+      .filter((p) => p.change?.dir === "down")
+      .sort((a, b) => (a.change?.pct ?? 0) - (b.change?.pct ?? 0))
       .slice(0, 6);
   }, [products]);
 
@@ -77,11 +83,12 @@ export default function HomePage() {
     <>
       <InitialLoader />
 
-      <div className="w-full bg-[#f4f6f2] min-h-screen py-6 sm:py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
-          <section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-[#ebf3e8] to-[#e1ecd9] border border-[#d2e2c7] p-6 sm:p-10 lg:p-12 shadow-xs">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
-              <div className="w-full md:w-3/5 space-y-4 text-left">
+      <div className="w-full bg-[#f4f6f2] min-h-screen py-4 sm:py-8 md:py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 sm:space-y-10 md:space-y-12">
+          {/* হিরো ব্যানার */}
+          <section className="relative overflow-hidden rounded-3xl bg-linear-to-br from-[#ebf3e8] to-[#e1ecd9] border border-[#d2e2c7] p-5 sm:p-8 md:p-10 lg:p-12 shadow-xs">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8 md:gap-12">
+              <div className="w-full md:w-3/5 space-y-3 sm:space-y-4 text-left">
                 <div className="inline-flex items-center gap-2 bg-[#d7e9cb] text-[#107c41] text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full border border-[#c1deae]">
                   <span>📅</span>
                   <span>{getBanglaDate()}</span>
@@ -91,15 +98,15 @@ export default function HomePage() {
                   আজকের বাজারের দর এক নজরে
                 </h1>
 
-                <p className="text-sm sm:text-base text-[#4a5f4e] leading-relaxed max-w-xl font-medium">
+                <p className="text-xs sm:text-sm md:text-base text-[#4a5f4e] leading-relaxed max-w-xl font-medium">
                   চাল, ডাল, তেল, সবজি, মাছ, মাংস, ডিম ও মসলার বাজারভিত্তিক দাম —
                   সর্বনিম্ন, সর্বোচ্চ এবং দৈনিক পরিবর্তন এক ক্লিকেই জানুন।
                 </p>
 
-                <div className="pt-2">
+                <div className="pt-1 sm:pt-2">
                   <a
                     href="#sobb-ponno"
-                    className="inline-flex items-center justify-center px-6 py-3 bg-[#107c41] hover:bg-[#0c6133] active:scale-95 text-white font-bold text-sm sm:text-base rounded-xl shadow-md shadow-[#107c41]/20 transition-all duration-200"
+                    className="inline-flex items-center justify-center px-5 sm:px-6 py-2.5 sm:py-3 bg-[#107c41] hover:bg-[#0c6133] active:scale-95 text-white font-bold text-xs sm:text-sm md:text-base rounded-xl shadow-md shadow-[#107c41]/20 transition-all duration-200"
                   >
                     সব পণ্য দেখুন ↓
                   </a>
@@ -107,7 +114,7 @@ export default function HomePage() {
               </div>
 
               <div className="w-full md:w-2/5 flex justify-center md:justify-end">
-                <div className="w-48 h-44 sm:w-60 sm:h-52 shrink-0 flex items-center justify-center">
+                <div className="w-44 h-40 sm:w-56 sm:h-48 md:w-60 md:h-52 shrink-0 flex items-center justify-center">
                   <svg
                     viewBox="0 0 240 200"
                     className="w-full h-full drop-shadow-md"
@@ -168,8 +175,8 @@ export default function HomePage() {
           </section>
 
           {loading ? (
-            <div className="space-y-10">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-8 sm:space-y-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {[...Array(6)].map((_, i) => (
                   <ProductCardSkeleton key={`skeleton-${i}`} />
                 ))}
@@ -177,45 +184,52 @@ export default function HomePage() {
             </div>
           ) : (
             <>
-              <section className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-red-500 text-sm">▲</span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-[#1f2937]">
-                    আজ দাম বেড়েছে
-                  </h2>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {topRisers.map((item) => (
-                    <ProductCard key={item.id} product={item} />
-                  ))}
-                </div>
-              </section>
+              {topRisers.length > 0 && (
+                <section className="space-y-3.5 sm:space-y-4 text-left">
+                  <div className="flex items-center gap-2">
+                    <span className="text-red-500 text-sm">▲</span>
+                    <h2 className="text-lg sm:text-2xl font-bold text-[#1f2937]">
+                      আজ দাম বেড়েছে
+                    </h2>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {topRisers.map((item) => (
+                      <ProductCard key={item.id} product={item} />
+                    ))}
+                  </div>
+                </section>
+              )}
 
-              <section className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-[#107c41] text-sm">▼</span>
-                  <h2 className="text-xl sm:text-2xl font-bold text-[#1f2937]">
-                    আজ দাম কমেছে
-                  </h2>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {topFallers.map((item) => (
-                    <ProductCard key={item.id} product={item} />
-                  ))}
-                </div>
-              </section>
+              {topFallers.length > 0 && (
+                <section className="space-y-3.5 sm:space-y-4 text-left">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[#107c41] text-sm">▼</span>
+                    <h2 className="text-lg sm:text-2xl font-bold text-[#1f2937]">
+                      আজ দাম কমেছে
+                    </h2>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {topFallers.map((item) => (
+                      <ProductCard key={item.id} product={item} />
+                    ))}
+                  </div>
+                </section>
+              )}
 
-              <section id="sobb-ponno" className="space-y-4 pt-4">
+              <section
+                id="sobb-ponno"
+                className="space-y-3.5 sm:space-y-4 pt-2 sm:pt-4 text-left"
+              >
                 <div className="flex flex-col gap-1">
-                  <h2 className="text-xl sm:text-2xl font-bold text-[#1f2937]">
+                  <h2 className="text-lg sm:text-2xl font-bold text-[#1f2937]">
                     সব পণ্য
                   </h2>
-                  <p className="text-xs text-gray-500 font-medium">
+                  <p className="text-xs sm:text-sm text-gray-500 font-medium">
                     মোট {toBengaliNumber(products.length)}টি পণ্য • প্রদর্শিত
                     হচ্ছে
                   </p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {products.map((item) => (
                     <ProductCard key={item.id} product={item} />
                   ))}

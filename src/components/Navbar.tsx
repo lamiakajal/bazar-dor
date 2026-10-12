@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Category, getBanglaDate } from "@/lib/utils";
@@ -20,7 +21,6 @@ export default function Navbar() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Sync category collection on mount
   useEffect(() => {
     let isMounted = true;
 
@@ -29,7 +29,7 @@ export default function Navbar() {
         const res = await fetch(`${API_BASE}/categories`);
         if (!res.ok) throw new Error("Failed to retrieve taxonomy data");
         const data: Category[] = await res.json();
-        if (isMounted) setCategories(data);
+        if (isMounted) setCategories(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Category taxonomy fetch error:", err);
       }
@@ -42,7 +42,6 @@ export default function Navbar() {
     };
   }, []);
 
-  // Invalidate current auth session and redirect home
   const handleSignOut = useCallback(async () => {
     try {
       await signOut({
@@ -50,20 +49,23 @@ export default function Navbar() {
           onSuccess: () => {
             toast.success("সাইন আউট সফল!");
             router.push("/");
+            router.refresh();
           },
         },
       });
     } catch (err) {
       console.error("Sign-out dispatch error:", err);
-      toast.error("সাইন আউট করা সম্ভব হয়নি। আবার চেষ্টা করুন।");
+      toast.error("সাইন আউট করা সম্ভব হয়নি। আবার চেষ্টা করুন।");
     }
   }, [router]);
 
+  const userName = session?.user?.name || "ইউজার";
+  const userEmail = session?.user?.email || "";
+  const userImage = session?.user?.image || null;
+
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-[#e7ece4] shadow-xs">
-      {/* Primary header bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
-        {/* Brand identity */}
         <Link href="/" className="flex items-center gap-3.5 group select-none">
           <div className="w-11 h-11 rounded-xl bg-[#107c41] flex items-center justify-center text-white text-2xl shadow-xs transition-transform duration-200 group-hover:scale-105">
             🛒
@@ -78,7 +80,6 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop auth actions */}
         <div className="hidden sm:flex items-center gap-3">
           {isPending ? (
             <span className="loading loading-spinner loading-md text-[#107c41]"></span>
@@ -87,38 +88,82 @@ export default function Navbar() {
               <div
                 tabIndex={0}
                 role="button"
-                className="btn btn-ghost btn-circle avatar"
+                className="flex items-center gap-2.5 p-1.5 pr-2 rounded-xl hover:bg-gray-50 border border-transparent hover:border-[#e5e9e2] cursor-pointer select-none transition-all"
               >
-                <div className="w-10 h-10 rounded-full ring-2 ring-[#107c41] ring-offset-2 overflow-hidden flex items-center justify-center bg-[#ecfdf5] text-[#107c41] text-base font-bold">
-                  {session.user.image ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
-                      src={session.user.image}
-                      alt={session.user.name || "User avatar"}
+                <div className="relative w-9 h-9 rounded-full ring-2 ring-[#107c41] ring-offset-1 overflow-hidden flex items-center justify-center bg-[#ecfdf5] shrink-0">
+                  {userImage ? (
+                    <Image
+                      src={userImage}
+                      alt={userName}
+                      fill
+                      className="object-cover"
                     />
                   ) : (
-                    <span>{session.user.name?.charAt(0) || "U"}</span>
+                    <div className="w-full h-full bg-[#107c41] text-white flex items-center justify-center font-bold text-sm uppercase">
+                      {userName ? userName.charAt(0) : "U"}
+                    </div>
                   )}
                 </div>
+                <span className="text-sm font-semibold text-gray-800">
+                  {userName}
+                </span>
+                <span className="text-xs text-gray-400">▾</span>
               </div>
-              <ul
+
+              <div
                 tabIndex={0}
-                className="menu menu-md dropdown-content mt-3 z-50 p-2 shadow-lg bg-white rounded-xl w-56 border border-[#e5e9e2] text-base"
+                className="dropdown-content mt-2 z-50 bg-white rounded-2xl w-64 p-4 border border-[#e5e9e2] shadow-xl space-y-3"
               >
-                <li className="menu-title px-4 py-2 font-bold text-gray-800 border-b border-gray-100 mb-1">
-                  {session.user.name}
-                </li>
-                <li>
-                  <Link href="/profile" className="py-2">
-                    প্রোফাইল
+                <div className="border-b border-gray-100 pb-2.5 text-left">
+                  <h4 className="text-sm font-bold text-gray-900 leading-tight">
+                    {userName}
+                  </h4>
+                  <p className="text-xs text-gray-400 mt-0.5 truncate font-normal">
+                    {userEmail}
+                  </p>
+                </div>
+
+                <div className="space-y-1">
+                  <Link
+                    href="/profile"
+                    className="flex items-center gap-2.5 px-2.5 py-2 text-sm font-medium text-gray-700 hover:text-[#107c41] hover:bg-gray-50 rounded-xl transition-colors"
+                  >
+                    <svg
+                      className="w-4 h-4 text-gray-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    <span>আমার প্রোফাইল</span>
                   </Link>
-                </li>
-                <li>
-                  <button onClick={handleSignOut} className="text-red-500 py-2">
-                    সাইন আউট
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full flex items-center gap-2.5 px-2.5 py-2 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl transition-colors text-left cursor-pointer"
+                  >
+                    <svg
+                      className="w-4 h-4 text-red-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
+                    </svg>
+                    <span>সাইন আউট</span>
                   </button>
-                </li>
-              </ul>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="flex items-center gap-3">
@@ -138,7 +183,6 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile menu trigger */}
         <div className="flex sm:hidden items-center">
           <button
             onClick={() => setMobileMenuOpen((prev) => !prev)}
@@ -172,7 +216,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Category scroll bar */}
       <div className="border-t border-[#e7ece4] bg-[#fafbfa]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav
@@ -193,7 +236,7 @@ export default function Navbar() {
               const isActive = pathname === `/category/${cat.slug}`;
               return (
                 <Link
-                  key={cat.id}
+                  key={cat.id || cat.slug}
                   href={`/category/${cat.slug}`}
                   className={`inline-flex items-center gap-2 whitespace-nowrap px-3 py-1 rounded-lg transition-all duration-150 ${
                     isActive
@@ -210,23 +253,42 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile drawer panel */}
       {mobileMenuOpen && (
         <div className="sm:hidden border-t border-[#e7ece4] bg-white px-5 py-5 space-y-4">
           {session?.user ? (
             <div className="space-y-3">
-              <p className="text-base font-bold text-gray-800">
-                {session.user.name}
-              </p>
+              <div className="flex items-center gap-3 pb-2 border-b border-gray-100">
+                <div className="relative w-9 h-9 rounded-full overflow-hidden border border-[#107c41] flex items-center justify-center bg-[#ecfdf5] shrink-0">
+                  {userImage ? (
+                    <Image
+                      src={userImage}
+                      alt={userName}
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-[#107c41] text-white flex items-center justify-center font-bold text-sm uppercase">
+                      {userName ? userName.charAt(0) : "U"}
+                    </div>
+                  )}
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-bold text-gray-800">{userName}</p>
+                  <p className="text-xs text-gray-400">{userEmail}</p>
+                </div>
+              </div>
               <Link
                 href="/profile"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-base text-gray-700 py-1.5"
+                className="block text-base text-gray-700 py-1.5 text-left"
               >
                 প্রোফাইল
               </Link>
               <button
-                onClick={handleSignOut}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleSignOut();
+                }}
                 className="block text-base text-red-500 py-1.5 text-left w-full font-medium"
               >
                 সাইন আউট
@@ -253,7 +315,6 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* Live Market Price Ticker */}
       <PriceTicker />
     </header>
   );
