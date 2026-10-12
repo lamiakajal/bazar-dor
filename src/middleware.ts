@@ -7,7 +7,9 @@ export async function middleware(request: NextRequest) {
 
   const isAuthRoute =
     pathname.startsWith("/signin") || pathname.startsWith("/signup");
-  const isProtectedRoute = pathname.startsWith("/profile");
+
+  const isProtectedRoute =
+    pathname.startsWith("/profile") || pathname.startsWith("/product");
 
   if (isProtectedRoute && !sessionCookie) {
     const signInUrl = new URL("/signin", request.url);
@@ -23,5 +25,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/profile/:path*", "/signin", "/signup"],
+  matcher: ["/profile/:path*", "/product/:path*", "/signin", "/signup"],
 };
